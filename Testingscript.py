@@ -1,25 +1,17 @@
 
 
 from blockchain import createwallet
-
-file = open("apikey.txt", "r")
-api_code = file.read()
-file.close()
-
-pass_file = open("password.txt", "r")
-passphrase = pass_file.read()
-pass_file.close()
+import util
 
 
-testwallet = createwallet.create_wallet(passphrase, api_code, "http://localhost:3000/", label = "Test Wallet")
+passfile = open("password.txt", "r")
+passphrase = passfile.read()
+passfile.close()
 
-testwallet_file_writer = open("testwallet.txt","w")
 
-testwallet_file_writer.write(testwallet.identifier)
-testwallet_file_writer.write("\n")
-testwallet_file_writer.write(testwallet.address)
-testwallet_file_writer.write('\n')
-testwallet_file_writer.write(testwallet.label)
+testwallet = util.get_wallet("testwallet.txt")
+
+
 
 
 def create_test_wallet(label, passphrase = None):
@@ -39,3 +31,4 @@ def create_test_wallet(label, passphrase = None):
 #     print(a.get_balance())
 #
 # util.print_the_thing()
+
