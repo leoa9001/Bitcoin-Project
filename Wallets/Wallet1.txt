@@ -1,0 +1,6 @@
+{
+    "identifier": "fb491f68-c92f-4ffa-8067-fa338ef9503c",
+    "passphrase": "default",
+    "label": "Wallet1",
+    "address": "1PApEUhsUd5bkv8PYKaou7iNZGdye4MLDu"
+}

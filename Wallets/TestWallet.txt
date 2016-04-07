@@ -1,0 +1,6 @@
+{
+    "identifier": "ba61d0d7-53ac-4962-86b1-1d917fb66d54",
+    "passphrase": "default",
+    "label": "TestWallet",
+    "address": "1Mr6AeMr5ZbJTCVjTsjLzyDX995meB3Kaj"
+}

@@ -1,0 +1,6 @@
+{
+    "identifier": "3a15ea82-0800-4c87-bdc5-29f7e8412e2f",
+    "passphrase": "default",
+    "label": "DonationWallet",
+    "address": "1G6Xs87nyLAHmn4AjJJKyoXji4BinXd67j"
+}
