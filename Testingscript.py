@@ -1,34 +1,31 @@
+import User.user_util as user_util
+# import shutil
 
-
-from blockchain import createwallet
-import util
-
-
-passfile = open("password.txt", "r")
-passphrase = passfile.read()
-passfile.close()
-
-
-testwallet = util.get_wallet("testwallet.txt")
-
-
-
-
-def create_test_wallet(label, passphrase = None):
-    if passphrase is None:
-        pass_file = open("password.txt")
-        passphrase = pass_file.read()
-
-    return createwallet.create_wallet(passphrase,api_code,'http://localhost:3000/',label = label)
-
-#Script 2: getting a wallet and outputting it's label and it's balance
+# from blockchain import createwallet
+# import util
+# import simplejson as json
 #
-# wallet = util.get_wallet("testwallet.txt")
 #
-# addresses = wallet.list_addresses()
+# passfile = open("password.txt", "r")
+# passphrase = passfile.read()
+# passfile.close()
 #
-# for a in addresses:
-#     print(a.get_balance())
 #
-# util.print_the_thing()
+# testwallet = util.get_wallet("Wallets/TestWallet.json")
+#
+# file1 = open("/Users/leoa9001/Desktop/Dox.png","rb")
+#
+# file2 = open("/Users/leoa9001/Desktop/tmp/Dox.png","rb")
+#
+# shutil.copyfile("/Users/leoa9001/Desktop/Dox.png", "/Users/leoa9001/Desktop/GearTesting/Tox.png")
+#
+# print(file1.read()==file2.read())
+#
+#
+# file1.close()
+# file2.close()
+
+user = user_util.get_user("testuser1")
+
+user.private_publish("Doxitius Picture", "/Users/leoa9001/Desktop/Dox.png", "Tox.png", description = "A picture of a friend whose ign is Toxidius")
 

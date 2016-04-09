@@ -1,5 +1,5 @@
 from blockchain.wallet import Wallet
-
+import simplejson as json
 
 #easier way to get the apikey
 def get_apikey():
@@ -16,7 +16,7 @@ def get_wallet(filename,passphrase = None):
         passfile.close()
 
     file = open(filename,"r")
-    identifier = file.readline()
+    identifier = json.loads(file.read()).get("identifier")
     return Wallet(identifier, passphrase, "http://localhost:3000")
 
 
