@@ -17,7 +17,7 @@ def get_wallet(filename,passphrase = None):
 
     file = open(filename,"r")
     identifier = json.loads(file.read()).get("identifier")
-    return Wallet(identifier, passphrase, "http://localhost:3000")
+    return Wallet(identifier, passphrase, "http://localhost:3000/",api_code=get_apikey())
 
 
 

@@ -1,6 +1,7 @@
 # Script to create python wallets (should only be run first)
 from blockchain import createwallet
 import simplejson as json
+import os
 
 file = open("apikey.txt", "r")
 api_code = file.read()
@@ -25,3 +26,18 @@ for wall in wallets:
     json_encoding = json.dumps(json_encoding, indent="    ")
     # print(json_encoding)
     file_writer.writelines(json_encoding)
+
+
+if os.path.exists("Wallets/MainWallet.json") or os.path.exists("MainWallet.json"):
+    print("MainWallet has already been created.")
+else:
+    main_wallet = createwallet.create_wallet(passphrase,api_code,"http://localhost:3000/",label = "MainWallet")
+    file_writer_1 = open("Wallets/MainWallet.json", "w")
+    file_writer_2 = open("MainWallet.json","w")
+    json_encoding = {"identifier": wall.identifier, "address": wall.address, "label": wall.label,
+                     "passphrase": "default"}
+    json_encoding = json.dumps(json_encoding, indent="    ")
+    # print(json_encoding)
+    file_writer_1.writelines(json_encoding)
+    file_writer_2.writelines(json_encoding)
+

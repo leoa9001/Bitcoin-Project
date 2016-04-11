@@ -93,13 +93,43 @@ class User:
     def has_privatekey(self):
         return self.__privatekey != None
 
+    def get_datanames_list(self):
+        datanames_file = open(os.path.expanduser("~") + "/.spp/users/"+self.__username+"/datanames.txt", "r")
+        datanames = []
+
+        for line in datanames_file:
+            if line[line.__len__() - 1] == "\n":
+                datanames.append(line[0:line.__len__() - 1])
+            else:
+                datanames.append(line)
+
+        return datanames
+
+    def get_filenames_list(self):
+        filenames_file = open(os.path.expanduser("~") + "/.spp/users/"+self.__username+"/filenames.txt", "r")
+        filenames = []
+
+        for line in filenames_file:
+            if line[line.__len__() - 1] == "\n":
+                filenames.append(line[0:line.__len__() - 1])
+            else:
+                filenames.append(line)
+
+        return filenames
+
+
     # Returns instance of SPPResponse; only works with text files at the moment
     def private_publish(self, name, path_to_file, new_file_name, description=None):
+        if name in User.get_datanames_list(self):
+            raise Exception("The name "+name+" is already taken.")
+        if new_file_name in User.get_filenames_list(self):
+            raise Exception("The filename "+new_file_name+" is already taken.")
+
         text_data = to_string(path_to_file)
         h = hashlib.sha256()
         h.update((self.__publickey).encode("utf-8"))
         h.update(str(text_data).encode("utf-8"))
-        tx_hash_digest = send_in(self, h)
+        tx_hash_digest = send_in(self, h) # may need to check this later.
 
         hash = hashlib.sha256()
         hash.update(str(text_data).encode("utf-8"))
@@ -124,3 +154,9 @@ class User:
         datanames.write(name+"\n")
 
         datanames.close()
+
+        filenames = open(file_path+"/filenames.txt","a")
+
+        filenames.write(new_file_name+"\n")
+
+        filenames.close()

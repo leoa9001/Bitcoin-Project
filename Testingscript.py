@@ -1,17 +1,13 @@
-import User.user_util as user_util
-# import shutil
-
-# from blockchain import createwallet
+# import User.user_util as user_util
+# import User.setup as setup
+# # import shutil
 # import util
-# import simplejson as json
-#
-#
-# passfile = open("password.txt", "r")
-# passphrase = passfile.read()
-# passfile.close()
-#
+import os
 #
 # testwallet = util.get_wallet("Wallets/TestWallet.json")
+#
+# addresses = testwallet.list_addresses()
+
 #
 # file1 = open("/Users/leoa9001/Desktop/Dox.png","rb")
 #
@@ -25,7 +21,4 @@ import User.user_util as user_util
 # file1.close()
 # file2.close()
 
-user = user_util.get_user("testuser1")
-
-user.private_publish("Doxitius Picture", "/Users/leoa9001/Desktop/Dox.png", "Tox.png", description = "A picture of a friend whose ign is Toxidius")
 
