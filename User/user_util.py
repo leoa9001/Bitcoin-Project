@@ -15,6 +15,7 @@ def get_username_list():
         else:
             users.append(line)
 
+    users_file.close()
     return users
 
 
@@ -55,7 +56,7 @@ class User:
     __description = None
 
     def __init__(self, username, password=None):
-        if (username not in get_username_list()) and (username != ""):
+        if (username not in get_username_list()) or ("" == username):
             raise Exception("User with username " + username + " has not been created.")
         self.__username = username
 
@@ -103,6 +104,7 @@ class User:
             else:
                 datanames.append(line)
 
+        datanames_file.close()
         return datanames
 
     def get_filenames_list(self):
@@ -115,6 +117,7 @@ class User:
             else:
                 filenames.append(line)
 
+        filenames_file.close()
         return filenames
 
 

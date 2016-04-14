@@ -22,7 +22,9 @@ def setup():
 def create_user(username, password, description=None):
     if username in user_util.get_username_list():
         return "Username already taken"
+
     home_dir = os.path.expanduser("~")
+
     with open(home_dir + "/.spp/users.txt", "a") as file:
         file.write(username + '\n')
         file.close()
@@ -45,6 +47,7 @@ def create_user(username, password, description=None):
     os.mkdir(path + "/" + username)
     os.mkdir(path + "/" + username + "/data")
     os.mkdir(path + "/" + username + "/metadata")  # Hash checksums for the data that you push to blockchain
+
     file = open(path + "/" + username + "/datanames.txt", "w")  # make the file
     file.close()
     file = open(path + "/" + username + "/filenames.txt", "w")
