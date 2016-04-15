@@ -45,7 +45,7 @@ def send_in(User, hash):
     # Send in the thing and wait for a response in the form of tx_hash
 
     # For Now:
-    return "dummytransactionhash"
+    return "dummytransactionhash."
 
 
 # Works for constructing users that have already been created using the setup.create_user()
@@ -129,9 +129,11 @@ class User:
             raise Exception("The filename "+new_file_name+" is already taken.")
 
         text_data = to_string(path_to_file)
+
         h = hashlib.sha256()
         h.update((self.__publickey).encode("utf-8"))
         h.update(str(text_data).encode("utf-8"))
+
         tx_hash_digest = send_in(self, h) # may need to check this later.
 
         hash = hashlib.sha256()

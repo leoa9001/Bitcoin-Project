@@ -32,16 +32,16 @@ def create_user(username, password, description=None):
     # Write in here something to write to usermetas a "[username].json"
     # needs to involve password to generate secretkey publickey pair.
     #
-    publickey = user_util.key_gen(password)[1]
+    public_key = user_util.key_gen(password)[1]
 
-    userdict = {"username": username, "publickey": publickey}
+    user_dict = {"username": username, "publickey": public_key}
 
-    if not description == None:
-        userdict["description"] = description
+    if description is not None:
+        user_dict["description"] = description
 
     user_file = open(home_dir + "/.spp/usermetas/" + username + ".json", "w")
 
-    user_file.write(json.dumps(userdict, indent=4 * " "))
+    user_file.write(json.dumps(user_dict, indent=4 * " "))
 
     path = home_dir + "/.spp/users"
     os.mkdir(path + "/" + username)
