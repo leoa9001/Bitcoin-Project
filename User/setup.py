@@ -1,6 +1,7 @@
 import os
 import simplejson as json
 import User.user_util as user_util
+import User.crypto as crypto
 
 
 def setup():
@@ -21,6 +22,7 @@ def setup():
 
 def create_user(username, password, description=None):
     if username in user_util.get_username_list():
+        print("Username already taken.")
         return "Username already taken"
 
     home_dir = os.path.expanduser("~")
@@ -32,7 +34,7 @@ def create_user(username, password, description=None):
     # Write in here something to write to usermetas a "[username].json"
     # needs to involve password to generate secretkey publickey pair.
     #
-    public_key = user_util.key_gen(password)[1]
+    public_key = crypto.key_gen(password)[1]
 
     user_dict = {"username": username, "publickey": public_key}
 

@@ -15,7 +15,7 @@ def key_gen(passphrase, dummy=False):
     public_key = full_key.publickey()
 
     # PEM Format string representations: (Private key, Public key)
-    return (full_key.exportKey(), public_key.exportkey())
+    return (str(full_key.exportKey(), encoding = "utf-8"), str(public_key.exportKey(), encoding = "utf-8"))
 
 
 # User sha256 from hashlib and return hexdigest (figure out how to make it work for arbitrary data though)
@@ -62,7 +62,7 @@ class PassPRG:
         for i in range(1, length):
             h = hashlib.sha256()
             h.update((str(self.__hash)+ str(self.__last_hash_num)).encode("utf-8"))
-            print("Hashed value: "+ str(self.__hash)+str(self.__last_hash_num))
+            # print("Hashed value: "+ str(self.__hash)+str(self.__last_hash_num))
             PRG_Bytes  = PRG_Bytes+h.digest()
             self.__last_hash_num += 1
 
