@@ -2,6 +2,8 @@ import os
 import simplejson as json
 import User.user_util as user_util
 import User.crypto as crypto
+import binascii
+
 
 
 def setup():
@@ -34,7 +36,7 @@ def create_user(username, password, description=None):
     # Write in here something to write to usermetas a "[username].json"
     # needs to involve password to generate secretkey publickey pair.
     #
-    public_key = crypto.key_gen(password)[1]
+    public_key = binascii.hexlify(crypto.key_gen(password)[1])
 
     user_dict = {"username": username, "publickey": public_key}
 

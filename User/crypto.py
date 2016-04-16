@@ -15,11 +15,11 @@ def key_gen(passphrase, dummy=False):
     public_key = full_key.publickey()
 
     # PEM Format string representations: (Private key, Public key)
-    return (str(full_key.exportKey(), encoding = "utf-8"), str(public_key.exportKey(), encoding = "utf-8"))
+    return (full_key.exportKey(format = "DER"), public_key.exportKey(format = "DER"))
 
 
 # User sha256 from hashlib and return hexdigest (figure out how to make it work for arbitrary data though)
-# def hash(data):
+# def hash(path_to_data):
 
 
 

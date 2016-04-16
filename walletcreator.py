@@ -1,4 +1,4 @@
-# Script to create python wallets (should only be run first)
+# Don't use this at all; completely deprecated and all :p See "Server folder"
 from blockchain import createwallet
 import simplejson as json
 import os

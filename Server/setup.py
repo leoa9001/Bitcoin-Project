@@ -2,10 +2,10 @@ import os
 from blockchain.exceptions import APIException
 from blockchain.createwallet import create_wallet
 import sys
-from Server import server_util as util
+from Server import server_util
+import simplejson as json
 
 
-# Remove all the stupid return 0s :p
 
 
 
@@ -28,7 +28,7 @@ def setup(apikey, passphrase, settings=None):
     pass_file.write(passphrase)
     pass_file.close()
 
-    wallet_list_file =open(home_dir+"/.sppserver/wallets.txt","w")
+    wallet_list_file = open(home_dir + "/.sppserver/wallets.txt", "w")
     wallet_list_file.close()
 
 
@@ -50,11 +50,11 @@ def create_wallet(wallet_name):
 
     # Create a swallet safely
     try:
-        api_code = util.get_apikey()
-        passphrase = util.get_passphrase()
+        api_code = server_util.get_apikey()
+        passphrase = server_util.get_passphrase()
         wallet = create_wallet(passphrase, api_code, "http://localhost:3000/", wallet_name)
     except APIException as exc:
-        print("An error has occurred api side; please try again.")
+        print("An error has occurred api side; please try again with createwallet(" + wallet_name + ").")
         print(exc.args)
         return
     except:
@@ -62,12 +62,17 @@ def create_wallet(wallet_name):
         return
 
     # Makes infrastructure to keep track of wallet in ~/.sppserver
-    with open(main_dir+"/wallets.txt","a") as file:
-        file.write(wallet_name+'\n')
+    with open(main_dir + "/wallets.txt", "a") as file:
+        file.write(wallet_name + '\n')
         file.close()
 
-    #still have to make [wallet_name].json; the wallet's address folder and things in it (also Wallet object)
+    # still have to make [wallet_name].json; the wallet's address folder and things in it (also Wallet object)
+    wallet_dct = {"identifier": wallet.identifier, "label": wallet.label, "passphrase": "default"}
 
-
+    wallet_writer = open(main_dir + "/Wallets/" + wallet_name + ".json", "w")
+    wallet_writer.write(json.dumps(wallet_dct, indent=4 * ' '))
+    wallet_writer.close()
+    # ^only [wallet_name].json
+    os.mkdir(main_dir + "/Addresses/" + wallet_name)
 
     return wallet

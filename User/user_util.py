@@ -3,6 +3,7 @@ import os
 import simplejson as json
 from shutil import copyfile
 import User.crypto as crypto
+import binascii
 
 
 def get_username_list():
@@ -62,12 +63,12 @@ class User:
         user_file.close()
 
         if password is None:
-            self.__publickey = user_info["publickey"]
+            self.__publickey = binascii.unhexlify(user_info["publickey"])
         else:
             keypair = crypto.key_gen(password)
-            if user_info["publickey"] != keypair[1]:
+            if binascii.unhexlify(user_info["publickey"]) != keypair[1]:
                 # print("userinfo pub: "+user_info["publickey"])
-                # print("keypair[1]: "+keypair[1])
+                # print("keypair[1]: "+str(keypair[1]))
                 raise Exception("Incorrect password.")
             self.__privatekey = keypair[0]
             self.__publickey = keypair[1]
@@ -94,7 +95,7 @@ class User:
         return self.__privatekey != None
 
     def get_datanames_list(self):
-        datanames_file = open(os.path.expanduser("~") + "/.spp/users/"+self.__username+"/datanames.txt", "r")
+        datanames_file = open(os.path.expanduser("~") + "/.spp/users/" + self.__username + "/datanames.txt", "r")
         datanames = []
 
         for line in datanames_file:
@@ -107,7 +108,7 @@ class User:
         return datanames
 
     def get_filenames_list(self):
-        filenames_file = open(os.path.expanduser("~") + "/.spp/users/"+self.__username+"/filenames.txt", "r")
+        filenames_file = open(os.path.expanduser("~") + "/.spp/users/" + self.__username + "/filenames.txt", "r")
         filenames = []
 
         for line in filenames_file:
@@ -119,33 +120,32 @@ class User:
         filenames_file.close()
         return filenames
 
-
     # Returns instance of SPPResponse; only works with text files at the moment
     def private_publish(self, name, path_to_file, new_file_name, description=None):
         if name in User.get_datanames_list(self):
-            raise Exception("The name "+name+" is already taken.")
+            raise Exception("The name " + name + " is already taken.")
         if new_file_name in User.get_filenames_list(self):
-            raise Exception("The filename "+new_file_name+" is already taken.")
+            raise Exception("The filename " + new_file_name + " is already taken.")
 
         text_data = to_string(path_to_file)
-
+        # print("Text data: ")
+        # print(text_data[0:50])
+        # print()
         h = hashlib.sha256()
-        h.update((self.__publickey).encode("utf-8"))
-        h.update(str(text_data).encode("utf-8"))
+        h.update(self.__publickey)
+        h.update(text_data)
 
-        tx_hash_digest = send_in(self, h) # may need to check this later.
+        tx_hash_digest = send_in(self, h.digest())  # may need to check this later.
 
-        hash = hashlib.sha256()
-        hash.update(str(text_data).encode("utf-8"))
 
         dct = {"name": name}
         dct["filename"] = new_file_name
-        dct["hash"] = hash.hexdigest()
+        dct["hash"] = h.hexdigest()
         dct["tx_hash"] = tx_hash_digest
         if description != None:
             dct["description"] = description
 
-        file_path = os.path.expanduser("~")+"/.spp/users/"+self.__username
+        file_path = os.path.expanduser("~") + "/.spp/users/" + self.__username
         metadata_file = open(file_path + "/metadata/" + name + ".json",
                              "w")
 
@@ -153,10 +153,10 @@ class User:
 
         copyfile(path_to_file, file_path + "/data/" + new_file_name)
 
-        datanames = open(file_path+"/datanames.txt", "a")
-        datanames.write(name+"\n")
+        datanames = open(file_path + "/datanames.txt", "a")
+        datanames.write(name + "\n")
         datanames.close()
 
-        filenames = open(file_path+"/filenames.txt","a")
-        filenames.write(new_file_name+"\n")
+        filenames = open(file_path + "/filenames.txt", "a")
+        filenames.write(new_file_name + "\n")
         filenames.close()

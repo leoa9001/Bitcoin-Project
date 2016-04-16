@@ -1,17 +1,26 @@
-# import util
-# from blockchain import blockexplorer
+import util
+from blockchain import blockexplorer
 
 from User import setup
 from User import user_util
 
 # wallet = util.get_wallet("MainWallet.json")
+# setup.setup()
+# setup.create_user("testuser3","testpassword3","Second Test User (with DER)")
+
+user = user_util.User("testuser3", "testpassword3")
+
+# user.private_publish("Test file 6", path_to_file= "/Users/leoa9001/Desktop/pdf.pdf", new_file_name="pdh.pdf")
+
+# setup(util.get_apikey(), "TestPassword")
+
 
 # Should send to: 141sNxH41k4dPPHcDhN8vj8m8K2D8AhWSM from 1JV3cXoFJVNAdtqbXu9ccepS8d5rXBamaH
 #
 # print(wallet.get_balance())
 #
 #
-# a = wallet.get_address("1MkqaB4cYCtVJ31fgyifdJ4CbgSuf69yvf")
+# a = wallet.get_address("141sNxH41k4dPPHcDhN8vj8m8K2D8AhWSM")
 # print(a.balance)
 
 
@@ -30,7 +39,10 @@ from User import user_util
 # for a in wallet.list_addresses():
 #     print(a.address)
 #
-# h = wallet.send("1MkqaB4cYCtVJ31fhelloJ4CbgSuf69yvf",amount = 5461)
+# h = wallet.send("141sNxH41k4dPPHcDhN8vhelloK2D8AhWSM", amount = 5461)
+
+
+# print(wallet.get_balance())
 # print(h.tx_hash)
 #
 # file = open("tx_hash.txt","a")
@@ -47,10 +59,8 @@ from User import user_util
 
 # setup.setup()
 
-setup.create_user("testuser2","testpassword2", "Second test user")
+# setup.create_user("testuser3","testpassword3", "Third test user")
 
 # user = user_util.get_user("testuser2", "testpassword1")
 
 # user = user_util.get_user("testuser1")
-
-
