@@ -6,9 +6,6 @@ from Server import server_util
 import simplejson as json
 
 
-
-
-
 # Sets main folder and such
 def setup(apikey, passphrase, settings=None):
     home_dir = os.path.expanduser("~")

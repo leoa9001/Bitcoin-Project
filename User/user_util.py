@@ -153,10 +153,10 @@ class User:
 
         copyfile(path_to_file, file_path + "/data/" + new_file_name)
 
-        datanames = open(file_path + "/datanames.txt", "a")
-        datanames.write(name + "\n")
-        datanames.close()
+        data_names = open(file_path + "/datanames.txt", "a")
+        data_names.write(name + "\n")
+        data_names.close()
 
-        filenames = open(file_path + "/filenames.txt", "a")
-        filenames.write(new_file_name + "\n")
-        filenames.close()
+        file_names = open(file_path + "/filenames.txt", "a")
+        file_names.write(new_file_name + "\n")
+        file_names.close()

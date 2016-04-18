@@ -3,12 +3,13 @@ from blockchain import blockexplorer
 
 from User import setup
 from User import user_util
-
+from User import crypto
+import binascii
 # wallet = util.get_wallet("MainWallet.json")
 # setup.setup()
 # setup.create_user("testuser3","testpassword3","Second Test User (with DER)")
 
-user = user_util.User("testuser3", "testpassword3")
+crypto.address(binascii.unhexlify("0450863AD64A87AE8A2FE83C1AF1A8403CB53F53E486D8511DAD8A04887E5B23522CD470243453A299FA9E77237716103ABC11A1DF38855ED6F2EE187E9C582BA6"))
 
 # user.private_publish("Test file 6", path_to_file= "/Users/leoa9001/Desktop/pdf.pdf", new_file_name="pdh.pdf")
 
