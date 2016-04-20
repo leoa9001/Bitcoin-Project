@@ -24,7 +24,7 @@ def key_gen(passphrase, dummy=False):
 # def hash(path_to_data):
 
 
-# have input data in bytes
+# have input data in bytes and it will return a string
 def address(input_data_bytes):
     hasher = hashlib.sha256()
     hasher.update(input_data_bytes)
@@ -45,35 +45,11 @@ def address(input_data_bytes):
 
     # print("Step 4: " + str(binascii.hexlify(hash)).upper())
     # print()
+    encoded_final = base58.b58encode_check(hash)
 
-    ripe = hash
+    # print((encoded_final).upper())
 
-    hasher = hashlib.sha256()
-    hasher.update(hash)
-    hash = hasher.digest()
-
-    # print("Step 5: "+ (str(binascii.hexlify(hash)).upper()))
-    # print()
-
-    hasher = hashlib.sha256()
-    hasher.update(hash)
-    hash = hasher.digest()
-
-    # print("Step 6: "+ str(binascii.hexlify(hash).upper()))
-    # print()
-    #
-    # print("Step 7:" + str(binascii.hexlify(hash[0:4])).upper())
-    #
-    # print("Step4 RIPE: "+ str(binascii.hexlify(ripe)).upper())
-    # print()
-
-    final_address_bytes = ripe+hash[0:4]
-
-    # print("Step 8: "+ str(binascii.hexlify(final_address_bytes)).upper())
-    # print()
-    encoded_final = base58.b58encode(final_address_bytes)
-
-    print(encoded_final)
+    return encoded_final
 
 
 # PRGClass that should handle passing rand_func and would keep track of multiple calls. REDO

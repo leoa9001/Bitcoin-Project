@@ -8,6 +8,12 @@ def get_apikey():
     file.close()
     return apikey
 
+def get_passphrase():
+    file = open("password.txt", "r")
+    passphrase = file.read()
+    file.close()
+    return passphrase
+
 #easy way to get a wallet via
 def get_wallet(filename,passphrase = None):
     if passphrase is None:

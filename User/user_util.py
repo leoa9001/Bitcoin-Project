@@ -38,11 +38,11 @@ def to_string(path_to_file):
     file.close()
     return f
 
-
+# This only works if you have a local working Server of the form outlined in Server and service-my-wallet working
 def send_in(User, hash):
     # Send in the thing and wait for a response in the form of tx_hash
 
-    # For Now:
+
     return "dummytransactionhash."
 
 

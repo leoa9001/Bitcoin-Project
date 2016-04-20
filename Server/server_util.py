@@ -14,7 +14,7 @@ def get_passphrase():
     return passphrase
 
 
-# Gets list of swallets (wallets made via create_wallet and definitely does not include Store wallet)
+# Gets list of wallets (wallets made via create_wallet and definitely does not include Store wallet)
 def get_wallet_list():
     wallets_file = open(os.path.expanduser("~")+"/.sppserver/wallets.txt", "r")
     wallets = []

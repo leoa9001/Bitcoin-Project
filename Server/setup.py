@@ -1,6 +1,6 @@
 import os
 from blockchain.exceptions import APIException
-from blockchain.createwallet import create_wallet
+from blockchain import createwallet
 import sys
 from Server import server_util
 import simplejson as json
@@ -13,45 +13,51 @@ def setup(apikey, passphrase, settings=None):
         print("SPP Server has already been set up.")
         return
 
-    os.mkdir(home_dir + "/.sppserver")
-    os.mkdir(home_dir + "/.sppserver/Wallets")
-    os.mkdir(home_dir + "/.sppserver/Addresses")
+    main_dir = home_dir + "/.sppserver"
 
-    api_file = open(home_dir + "/.sppserver/apikey.txt", "w")
+    os.mkdir(main_dir)
+    os.mkdir(main_dir + "/Wallets")
+    os.mkdir(main_dir + "/Publishes")
+    os.mkdir(main_dir + "/Stats")
+
+    api_file = open(main_dir + "/apikey.txt", "w")
     api_file.write(apikey)
     api_file.close()
 
-    pass_file = open(home_dir + "/.sppserver/passphrase.txt", "w")
+    pass_file = open(main_dir + "/passphrase.txt", "w")
     pass_file.write(passphrase)
     pass_file.close()
 
-    wallet_list_file = open(home_dir + "/.sppserver/wallets.txt", "w")
+    wallet_list_file = open(main_dir + "/wallets.txt", "w")
     wallet_list_file.close()
 
 
     # Here you would populate settings.json with defaults if None and settings specified if some given.
 
-
-    # Here you would make the store wallet using functions from store_wallet.py
+    make_wallet("MainWallet")
 
 
     # Here you would call function create_wallet("MainWallet") from server_util.py
 
 
 # Creates and returns a server_util.Wallet (not a blockchain.wallet.Wallet)
-def create_wallet(wallet_name):
+def make_wallet(wallet_name):
     main_dir = os.path.expanduser("~") + "/.sppserver"
-    if os.path.exists(main_dir + "/Addresses/" + wallet_name):
+
+    # rewrite with wallets.txt
+    if wallet_name in server_util.get_wallet_list() or wallet_name is "":
         print("A wallet with the name " + wallet_name + " already exists.")
         return
 
-    # Create a swallet safely
+    # Create a wallet safely
     try:
         api_code = server_util.get_apikey()
+        # print(api_code)
         passphrase = server_util.get_passphrase()
-        wallet = create_wallet(passphrase, api_code, "http://localhost:3000/", wallet_name)
+        wallet = createwallet.create_wallet(password=passphrase, api_code=api_code, service_url="http://localhost:3000/", label = wallet_name)
+        # print(wallet.identifier)
     except APIException as exc:
-        print("An error has occurred api side; please try again with createwallet(" + wallet_name + ").")
+        print("An error has occurred api side; please try again with make_wallet(" + wallet_name + ").")
         print(exc.args)
         return
     except:
@@ -70,6 +76,13 @@ def create_wallet(wallet_name):
     wallet_writer.write(json.dumps(wallet_dct, indent=4 * ' '))
     wallet_writer.close()
     # ^only [wallet_name].json
-    os.mkdir(main_dir + "/Addresses/" + wallet_name)
+
+    os.mkdir(main_dir + "/Publishes/" + wallet_name)
+    file = open(main_dir + "/Publishes/" + wallet_name + "/tx_hash_list.txt", "w")
+    file.close()
+
+    os.mkdir(main_dir+"/Publishes/"+wallet_name+"/Publishmetas")
+
+
 
     return wallet
