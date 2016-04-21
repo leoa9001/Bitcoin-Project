@@ -41,7 +41,7 @@ def address(input_data_bytes):
     # print(hasher.hexdigest().upper())
     # print()
 
-    hash = binascii.unhexlify("00")+hash
+    hash = binascii.unhexlify("00") + hash
 
     # print("Step 4: " + str(binascii.hexlify(hash)).upper())
     # print()
@@ -56,34 +56,36 @@ def address(input_data_bytes):
 class PassPRG:
     __hash = None
     __last_hash_num = 0
+    __byte_index = 0
+    __hash_bytes = bytes()
 
     # passphrase must be a string
     def __init__(self, passphrase):
         h = hashlib.sha256()
-        h.update(passphrase.encode("utf-8"))
-        self.__hash = h.hexdigest()
+        h.update(bytes(passphrase, encoding = "utf-8"))
+        self.__hash = h.digest()
 
     def randfunc(self, N):
         if N <= 0:
             raise ValueError
             return
 
-        length = N // 32
+        byte_gen = N - 32 * self.__last_hash_num + self.__byte_index
+        num_hashes = (byte_gen) // 32
 
-        if N % 32 != 0:
-            length += 1
+        if byte_gen % 32 != 0:
+            num_hashes += 1
 
-        h = hashlib.sha256()
-        h.update((str(self.__hash) + str(self.__last_hash_num)).encode("utf-8"))
-        # print("Hashed value: "+ str(self.__hash)+str(self.__last_hash_num)+" N: "+str(N))
-        PRG_Bytes = h.digest()
-        self.__last_hash_num += 1
+        self.generate(num_hashes)
 
-        for i in range(1, length):
+        self.__byte_index += N
+
+        return self.__hash_bytes[self.__byte_index - N:self.__byte_index]
+
+    def generate(self, num_hashes):
+        for i in range(0, num_hashes):
+            # print("Generating w/ hashnum: "+ str(self.__last_hash_num))
             h = hashlib.sha256()
-            h.update((str(self.__hash) + str(self.__last_hash_num)).encode("utf-8"))
-            # print("Hashed value: "+ str(self.__hash)+str(self.__last_hash_num))
-            PRG_Bytes = PRG_Bytes + h.digest()
+            h.update(self.__hash + bytes(self.__last_hash_num))
+            self.__hash_bytes = self.__hash_bytes + h.digest()
             self.__last_hash_num += 1
-
-        return PRG_Bytes[0:N]

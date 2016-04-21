@@ -4,6 +4,7 @@ import simplejson as json
 from shutil import copyfile
 import User.crypto as crypto
 import binascii
+import Server.server_util
 
 
 def get_username_list():
@@ -38,12 +39,16 @@ def to_string(path_to_file):
     file.close()
     return f
 
+
 # This only works if you have a local working Server of the form outlined in Server and service-my-wallet working
-def send_in(User, hash):
+def send_in(address, type="local"):
     # Send in the thing and wait for a response in the form of tx_hash
+    if type != "local":
+        return "dummytransactionhash"
 
 
-    return "dummytransactionhash."
+    tx_hash = Server.server_util.private_publish(address)
+    return tx_hash
 
 
 # Works for constructing users that have already been created using the setup.create_user()
@@ -135,18 +140,20 @@ class User:
         h.update(self.__publickey)
         h.update(text_data)
 
-        tx_hash_digest = send_in(self, h.digest())  # may need to check this later.
+        address = crypto.address(h.digest())
+        tx_hash = send_in(address)  # may need to check this later.
 
-
-        dct = {"name": name}
-        dct["filename"] = new_file_name
-        dct["hash"] = h.hexdigest()
-        dct["tx_hash"] = tx_hash_digest
+        dct = {"name": name,
+               "filename": new_file_name,
+               "hash": str(h.digest(), encoding="utf-8"),
+               "address": address,
+               "tx_hash": tx_hash
+               }
         if description != None:
             dct["description"] = description
 
         file_path = os.path.expanduser("~") + "/.spp/users/" + self.__username
-        metadata_file = open(file_path + "/metadata/" + name + ".json",
+        metadata_file = open(file_path + "/metadata/unconfirmed/" + name + ".json",
                              "w")
 
         metadata_file.write(json.dumps(dct, indent=4 * " "))
