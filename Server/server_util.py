@@ -67,7 +67,7 @@ def private_publish(address, wallet_name="MainWallet"):
         return "failed private publish"
 
     # Write in data here
-    file = open(os.expanduser("~") + "/.sppserver/Publishes/" + wallet_name + "/tx_hash_list.txt", "a")
+    file = open(os.path.expanduser("~") + "/.sppserver/Publishes/" + wallet_name + "/tx_hash_list.txt", "a")
     file.write(response.tx_hash + "\n")
     file.close()
 
@@ -78,7 +78,7 @@ def private_publish(address, wallet_name="MainWallet"):
         "tx_hash": response.tx_hash
     }
     # Rewrite this youf ool!
-    file = open(os.expanduser("~") + "/.sppserver/Publishes/" + wallet_name + "/Publishmetas/" + address + ".json")
+    file = open(os.path.expanduser("~") + "/.sppserver/Publishes/" + wallet_name + "/Publishmetas/" + address + ".json", "w")
     file.write(json.dumps(data_json))
     file.close()
 

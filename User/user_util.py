@@ -155,7 +155,7 @@ class User:
         dct = {
             "name": name,
             "filename": new_file_name,
-            "hash": str(h.digest(), encoding="utf-8"),
+            "hash": h.hexdigest(),
             "address": address,
             "tx_hash": tx_hash,
             "time": get_current_time()
