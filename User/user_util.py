@@ -24,8 +24,6 @@ def get_username_list():
     return users
 
 
-
-
 def get_user(username, password=None):
     if password is None:
         return User(username)
@@ -193,6 +191,10 @@ class User:
                         print(e.args)
                         continue
 
+                    if response[1] == -1:
+                        print("Unconfirmed file " + filename + ". The tx has however gone in and should be confirmed soon.")
+                        continue
+
                     dct["realtime"] = response[0]
                     dct["timedifference"] = response[0] - int(dct["time"])
 
@@ -201,3 +203,5 @@ class User:
                     file.close()
 
                     os.remove(path=path + "/unconfirmed/" + filename)
+
+                    print("Validated file: " + filename + ".")
