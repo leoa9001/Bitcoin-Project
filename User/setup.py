@@ -51,7 +51,7 @@ def create_user(username, password, description=None):
     os.mkdir(path + "/" + username + "/data")
     os.mkdir(path + "/" + username + "/metadata")  # Hash checksums for the data that you push to blockchain
     os.mkdir(path + "/" + username + "/metadata/unconfirmed")
-    os.mkdir(path + "/" + username + "metadata/confirmed")
+    os.mkdir(path + "/" + username + "/metadata/confirmed")
 
     file = open(path + "/" + username + "/datanames.txt", "w")  # make the file
     file.close()

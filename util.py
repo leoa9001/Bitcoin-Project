@@ -1,5 +1,6 @@
 from blockchain.wallet import Wallet
 import simplejson as json
+import datetime
 
 #easier way to get the apikey
 def get_apikey():
@@ -24,6 +25,10 @@ def get_wallet(filename,passphrase = None):
     file = open(filename,"r")
     identifier = json.loads(file.read()).get("identifier")
     return Wallet(identifier, passphrase, "http://localhost:3000/",api_code=get_apikey())
+
+# Return current time as an integer
+def get_current_time():
+    return int(datetime.datetime.now().timestamp())
 
 
 

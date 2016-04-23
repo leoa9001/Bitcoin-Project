@@ -1,28 +1,37 @@
 import os
 import simplejson as json
 from blockchain import wallet
+import datetime
+from blockchain.util import APIException
+
 
 def get_apikey():
-    file = open(os.path.expanduser("~")+"/.sppserver/apikey.txt","r")
+    file = open(os.path.expanduser("~") + "/.sppserver/apikey.txt", "r")
     apikey = file.read()
     file.close()
     return apikey
 
+
 def get_passphrase():
-    file = open(os.path.expanduser("~")+"/.sppserver/passphrase.txt", "r")
+    file = open(os.path.expanduser("~") + "/.sppserver/passphrase.txt", "r")
     passphrase = file.read()
     file.close()
     return passphrase
 
 
+# Return current time as an integer
+def get_current_time():
+    return int(datetime.datetime.now().timestamp())
+
+
 # Gets list of wallets (wallets made via create_wallet and definitely does not include Store wallet)
 def get_wallet_list():
-    wallets_file = open(os.path.expanduser("~")+"/.sppserver/wallets.txt", "r")
+    wallets_file = open(os.path.expanduser("~") + "/.sppserver/wallets.txt", "r")
     wallets = []
 
     for line in wallets_file:
-        if line[line.__len__()-1] == "\n":
-            wallets.append(line[0:line.__len__()-1])
+        if line[line.__len__() - 1] == "\n":
+            wallets.append(line[0:line.__len__() - 1])
         else:
             wallets.append(line)
 
@@ -30,34 +39,56 @@ def get_wallet_list():
     return wallets
 
 
+# Server utilities
 
-#Server utilities
-
-#Main Wallet by default
-def get_wallet(wallet_name = "MainWallet"):
-    wallet_file = open(os.path.expanduser("~")+"/.sppserver/Wallets/"+wallet_name+".json")
+# Main Wallet by default
+def get_wallet(wallet_name="MainWallet"):
+    wallet_file = open(os.path.expanduser("~") + "/.sppserver/Wallets/" + wallet_name + ".json")
     wallet_json = json.loads(wallet_file.read())
     wallet_file.close()
 
-    if wallet_json["passphrase"] is "default":
+    if wallet_json["passphrase"] == "default":
         passphrase = get_passphrase()
     else:
         passphrase = wallet_json["passphrase"]
+    # print(passphrase)
+    return wallet.Wallet(identifier=wallet_json["identifier"], password=passphrase,
+                         service_url="http://localhost:3000/", api_code=get_apikey())
 
 
-    return wallet.Wallet(identifier = wallet_json["identifier"], password = passphrase, service_url="http://localhost:3000/", api_code= get_apikey())
-
-
-#Should return the transaction hash:
-def private_publish(address, wallet_name = "MainWallet"):
+# Should return the transaction hash:
+def private_publish(address, wallet_name="MainWallet"):
     wallet = get_wallet(wallet_name)
+    try:
+        response = wallet.send(to=address, amount=5461)
+    except APIException as e:
+        print("API response: ")
+        print(e.args)
+        return "failed private publish"
 
-    response = wallet.send(to = address, amount = 5461)
+    # Write in data here
+    file = open(os.expanduser("~") + "/.sppserver/Publishes/" + wallet_name + "/tx_hash_list.txt", "a")
+    file.write(response.tx_hash + "\n")
+    file.close()
 
-
-    #Write in data here
-    file = open(os.expanduser("~")+ "/.sppserver/Publishes/"+wallet_name+"/tx_hash_list.txt", "a")
-    file.write(response.tx_hash+"\n")
+    data_json = {
+        "Wallet": wallet_name,
+        "address": address,
+        "time": get_current_time(),
+        "tx_hash": response.tx_hash
+    }
+    # Rewrite this youf ool!
+    file = open(os.expanduser("~") + "/.sppserver/Publishes/" + wallet_name + "/Publishmetas/" + address + ".json")
+    file.write(json.dumps(data_json))
     file.close()
 
     return response.tx_hash
+
+
+def get_donation_address(wallet_name="MainWallet"):
+    wallet = get_wallet("MainWallet")
+    return wallet.new_address(label="Donation Address").address
+
+
+def get_balance(wallet_name="MainWallet"):
+    return get_wallet(wallet_name).get_balance()

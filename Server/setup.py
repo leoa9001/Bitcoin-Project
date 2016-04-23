@@ -31,13 +31,9 @@ def setup(apikey, passphrase, settings=None):
     wallet_list_file = open(main_dir + "/wallets.txt", "w")
     wallet_list_file.close()
 
-
     # Here you would populate settings.json with defaults if None and settings specified if some given.
 
     make_wallet("MainWallet")
-
-
-    # Here you would call function create_wallet("MainWallet") from server_util.py
 
 
 # Creates and returns a server_util.Wallet (not a blockchain.wallet.Wallet)
@@ -54,7 +50,9 @@ def make_wallet(wallet_name):
         api_code = server_util.get_apikey()
         # print(api_code)
         passphrase = server_util.get_passphrase()
-        wallet = createwallet.create_wallet(password=passphrase, api_code=api_code, service_url="http://localhost:3000/", label = wallet_name)
+        # print(passphrase)
+        wallet = createwallet.create_wallet(password=passphrase, api_code=api_code,
+                                            service_url="http://localhost:3000/", label=wallet_name)
         # print(wallet.identifier)
     except APIException as exc:
         print("An error has occurred api side; please try again with make_wallet(" + wallet_name + ").")
@@ -81,8 +79,6 @@ def make_wallet(wallet_name):
     file = open(main_dir + "/Publishes/" + wallet_name + "/tx_hash_list.txt", "w")
     file.close()
 
-    os.mkdir(main_dir+"/Publishes/"+wallet_name+"/Publishmetas")
-
-
+    os.mkdir(main_dir + "/Publishes/" + wallet_name + "/Publishmetas")
 
     return wallet

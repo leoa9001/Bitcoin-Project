@@ -5,6 +5,7 @@ from shutil import copyfile
 import User.crypto as crypto
 import binascii
 import Server.server_util
+import datetime
 
 
 def get_username_list():
@@ -46,9 +47,13 @@ def send_in(address, type="local"):
     if type != "local":
         return "dummytransactionhash"
 
-
     tx_hash = Server.server_util.private_publish(address)
     return tx_hash
+
+
+# Return current time as an integer
+def get_current_time():
+    return int(datetime.datetime.now().timestamp())
 
 
 # Works for constructing users that have already been created using the setup.create_user()
@@ -143,12 +148,19 @@ class User:
         address = crypto.address(h.digest())
         tx_hash = send_in(address)  # may need to check this later.
 
-        dct = {"name": name,
-               "filename": new_file_name,
-               "hash": str(h.digest(), encoding="utf-8"),
-               "address": address,
-               "tx_hash": tx_hash
-               }
+        if tx_hash=="failed private publish":
+            raise Exception("Private publish failed server side.")
+            return
+
+        dct = {
+            "name": name,
+            "filename": new_file_name,
+            "hash": str(h.digest(), encoding="utf-8"),
+            "address": address,
+            "tx_hash": tx_hash,
+            "time": get_current_time()
+        }
+
         if description != None:
             dct["description"] = description
 
