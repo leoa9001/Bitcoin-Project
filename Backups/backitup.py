@@ -5,7 +5,7 @@ import shutil
 
 
 
-def backitup(path_to_dir):
+def backitup(path_to_dir,description = None):
     if not os.path.exists(path_to_dir):
         os.mkdir(path_to_dir)
 
@@ -22,3 +22,9 @@ def backitup(path_to_dir):
     file.close()
 
     print("Successfully backed up spp and sppserver on "+ timestamp)
+
+    if description is not None:
+        file = open(path_to_dir+"/"+timestamp+"/description.txt", "w")
+        file.write(description)
+        file.close()
+
