@@ -6,6 +6,7 @@ import User.crypto as crypto
 import binascii
 import Server.server_util
 import datetime
+import Validator.validate as validate
 
 
 def get_username_list():
@@ -22,8 +23,6 @@ def get_username_list():
     users_file.close()
     return users
 
-
-# To be written and needs: key_gen and hash and send in
 
 
 
@@ -148,7 +147,7 @@ class User:
         address = crypto.address(h.digest())
         tx_hash = send_in(address)  # may need to check this later.
 
-        if tx_hash=="failed private publish":
+        if tx_hash == "failed private publish":
             raise Exception("Private publish failed server side.")
             return
 
@@ -165,8 +164,7 @@ class User:
             dct["description"] = description
 
         file_path = os.path.expanduser("~") + "/.spp/users/" + self.__username
-        metadata_file = open(file_path + "/metadata/unconfirmed/" + name + ".json",
-                             "w")
+        metadata_file = open(file_path + "/metadata/unconfirmed/" + name + ".json", "w")
 
         metadata_file.write(json.dumps(dct, indent=4 * " "))
 
@@ -179,3 +177,27 @@ class User:
         file_names = open(file_path + "/filenames.txt", "a")
         file_names.write(new_file_name + "\n")
         file_names.close()
+
+    def validate(self, dataname=None):
+        if dataname is None:
+            path = os.path.expanduser("~") + "/.spp/users/" + self.__username + "/metadata"
+            for filename in os.listdir(path=path + "/unconfirmed"):
+                if filename.endswith(".json"):
+                    file = open(path + "/unconfirmed/" + filename, "r")
+                    dct = json.loads(file.read())
+                    file.close()
+                    try:
+                        response = validate.validate(dct["tx_hash"], dct["address"])
+                    except Exception as e:
+                        print("Validate Exception:")
+                        print(e.args)
+                        continue
+
+                    dct["realtime"] = response[0]
+                    dct["timedifference"] = response[0] - int(dct["time"])
+
+                    file = open(path + "/confirmed/" + filename, "w")
+                    file.write(json.dumps(dct, indent=4 * ' '))
+                    file.close()
+
+                    os.remove(path=path + "/unconfirmed/" + filename)
