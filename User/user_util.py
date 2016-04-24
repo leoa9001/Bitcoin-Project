@@ -192,7 +192,8 @@ class User:
                         continue
 
                     if response[1] == -1:
-                        print("Unconfirmed file " + filename + ". The tx has however gone in and should be confirmed soon.")
+                        print(
+                            "Unconfirmed file " + filename + ". The tx has however gone in and should be confirmed soon.")
                         continue
 
                     dct["realtime"] = response[0]
@@ -205,3 +206,54 @@ class User:
                     os.remove(path=path + "/unconfirmed/" + filename)
 
                     print("Validated file: " + filename + ".")
+
+    def check_corruptions(self, safe_print=False):
+        try:
+            self.validate()
+        except Exception as e:
+            print("Error occurred in validation.")
+            print(e.args)
+            return False
+        path = os.path.expanduser("~") + "/.spp/users/" + self.__username + "/metadata/confirmed"
+
+        list_of_corrupted = []
+        for filename in os.listdir(path):
+            if filename.endswith(".json"):
+                corrupted = False
+
+                try:
+                    file = open(path + "/" + filename, "r")
+                    dct = json.loads(file.read())
+                    file.close()
+
+                    path_to_data = os.path.expanduser("~") + "/.spp/users/" + self.__username + "/data/" + dct[
+                        "filename"]
+
+                    text_data = to_string(path_to_data)
+                except:
+                    print("An error occurred in file handling on file: " + filename)
+                    print("Some files may be missing or the filename may be corrupted.")
+                    list_of_corrupted.append(filename)
+                    continue
+
+                h = hashlib.sha256()
+                h.update(self.__publickey)
+                h.update(text_data)
+
+                if not h.hexdigest() == dct["hash"]:
+                    print("Hash mismatch error on file: " + filename)
+                    corrupted = True
+                if not crypto.address(h.digest()):
+                    print("Address mismatch error on file: " + filename)
+                    corrupted = True
+
+                if corrupted:
+                    list_of_corrupted.append(filename)
+                elif safe_print:
+                    print("The file " + filename + " is not corrupted.")
+
+        if list_of_corrupted.__len__() > 0:
+            print("THE FOLLOWING DATA ARE CORRUPTED IN SOME WAY:")
+
+        for dataname in list_of_corrupted:
+            print(dataname + "is corrupted.")
