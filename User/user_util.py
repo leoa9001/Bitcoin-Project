@@ -2,11 +2,12 @@ import hashlib
 import os
 import simplejson as json
 from shutil import copyfile
+from shutil import copytree
 import User.crypto as crypto
 import binascii
 import Server.server_util
 import datetime
-import Validator.validate as validate
+import Verifier.verify as verify
 
 
 def get_username_list():
@@ -31,12 +32,25 @@ def get_user(username, password=None):
 
 
 # Function that turns arbitrary file into a string; should be updated later.
-def to_string(path_to_file):
-    file = open(path_to_file, "rb")
-    f = file.read()
-    file.close()
-    return f
+def to_bytes(path_to_file):
+    if os.path.isfile(path_to_file):
+        file = open(path_to_file, "rb")
+        f = file.read()
+        file.close()
+        return f
 
+    if os.path.isdir(path_to_file):
+        byte_array = bytearray()
+        for root, dirs, files in os.walk(path_to_file):
+            # gc.disable()
+            for file in files:
+                # print(os.path.isfile(root+ "/"+ file))
+                file = open(root+"/"+file,"rb")
+                byte_array+=file.read()
+                file.close()
+            # gc.enable()
+        return bytes(byte_array)
+    return b""
 
 # This only works if you have a local working Server of the form outlined in Server and service-my-wallet working
 def send_in(address, type="local"):
@@ -74,8 +88,6 @@ class User:
         else:
             keypair = crypto.key_gen(password)
             if binascii.unhexlify(user_info["publickey"]) != keypair[1]:
-                # print("userinfo pub: "+user_info["publickey"])
-                # print("keypair[1]: "+str(keypair[1]))
                 raise Exception("Incorrect password.")
             self.__privatekey = keypair[0]
             self.__publickey = keypair[1]
@@ -96,10 +108,10 @@ class User:
         return self.__privatekey
 
     def has_description(self):
-        return self.__description != None
+        return self.__description is not None
 
     def has_privatekey(self):
-        return self.__privatekey != None
+        return self.__privatekey is not None
 
     def get_datanames_list(self):
         datanames_file = open(os.path.expanduser("~") + "/.spp/users/" + self.__username + "/datanames.txt", "r")
@@ -128,16 +140,13 @@ class User:
         return filenames
 
     # Returns instance of SPPResponse; only works with text files at the moment
-    def private_publish(self, name, path_to_file, new_file_name, description=None):
+    def private_publish(self, name, path_to_data, new_data_name, description=None):
         if name in User.get_datanames_list(self):
             raise Exception("The name " + name + " is already taken.")
-        if new_file_name in User.get_filenames_list(self):
-            raise Exception("The filename " + new_file_name + " is already taken.")
+        if new_data_name in User.get_filenames_list(self):
+            raise Exception("The filename " + new_data_name + " is already taken.")
 
-        text_data = to_string(path_to_file)
-        # print("Text data: ")
-        # print(text_data[0:50])
-        # print()
+        text_data = to_bytes(path_to_data)
         h = hashlib.sha256()
         h.update(self.__publickey)
         h.update(text_data)
@@ -151,7 +160,7 @@ class User:
 
         dct = {
             "name": name,
-            "filename": new_file_name,
+            "filename": new_data_name,
             "hash": h.hexdigest(),
             "address": address,
             "tx_hash": tx_hash,
@@ -162,18 +171,25 @@ class User:
             dct["description"] = description
 
         file_path = os.path.expanduser("~") + "/.spp/users/" + self.__username
+
+        if os.path.isfile(path_to_data):
+            copyfile(path_to_data, file_path + "/data/" + new_data_name)
+        elif os.path.isdir(path_to_data):
+            copytree(path_to_data, file_path + "/data/" + new_data_name)
+        else:
+            raise Exception("Error in copying file.")
+
+
         metadata_file = open(file_path + "/metadata/unconfirmed/" + name + ".json", "w")
 
         metadata_file.write(json.dumps(dct, indent=4 * " "))
-
-        copyfile(path_to_file, file_path + "/data/" + new_file_name)
 
         data_names = open(file_path + "/datanames.txt", "a")
         data_names.write(name + "\n")
         data_names.close()
 
         file_names = open(file_path + "/filenames.txt", "a")
-        file_names.write(new_file_name + "\n")
+        file_names.write(new_data_name + "\n")
         file_names.close()
 
     def validate(self, dataname=None):
@@ -185,15 +201,15 @@ class User:
                     dct = json.loads(file.read())
                     file.close()
                     try:
-                        response = validate.validate(dct["tx_hash"], dct["address"])
+                        response = verify.verify(dct["tx_hash"], dct["address"])
                     except Exception as e:
-                        print("Validate Exception:")
+                        print("Verification Exception:")
                         print(e.args)
                         continue
 
                     if response[1] == -1:
                         print(
-                            "Unconfirmed file " + filename + ". The tx has however gone in and should be confirmed soon.")
+                            "Unconfirmed file " + filename + ". However, the tx has gone in and should be confirmed soon.")
                         continue
 
                     dct["realtime"] = response[0]
@@ -229,7 +245,7 @@ class User:
                     path_to_data = os.path.expanduser("~") + "/.spp/users/" + self.__username + "/data/" + dct[
                         "filename"]
 
-                    text_data = to_string(path_to_data)
+                    text_data = to_bytes(path_to_data)
                 except:
                     print("An error occurred in file handling on file: " + filename)
                     print("Some files may be missing or the filename may be corrupted.")

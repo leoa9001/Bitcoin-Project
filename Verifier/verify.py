@@ -2,7 +2,7 @@ from blockchain import blockexplorer
 from blockchain.util import APIException
 
 
-def validate(tx_hash, address):
+def verify(tx_hash, address):
     try:
         tx = blockexplorer.get_tx(tx_hash, api_code=get_apikey())
     except APIException:
@@ -27,7 +27,7 @@ def validate(tx_hash, address):
 
 
 def get_apikey():
-    file = open("Validator/apikey.txt", "r")
+    file = open("Verifier/apikey.txt", "r")
     api_code = file.read()
     file.close()
     return api_code
