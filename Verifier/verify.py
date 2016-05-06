@@ -15,13 +15,11 @@ def verify(tx_hash, address):
     match = False
     for a in tx.outputs:
         if a.address == address:
-            # print("Address match: " + address)
             match = True
             break
 
     if not match:
         raise Exception("Transaction address may not have matched")
-
 
     return (tx.time, tx.block_height)
 

@@ -16,10 +16,8 @@ def setup():
     os.mkdir(home_dir + "/.spp/usermetas")
     file = open(home_dir + "/.spp/users.txt", "w")
     file.close()
-    # print("Full run.")
 
 
-# Returns a response message.
 
 def create_user(username, password, description=None):
     if username in user_util.get_username_list():
@@ -32,9 +30,6 @@ def create_user(username, password, description=None):
         file.write(username + '\n')
         file.close()
 
-    # Write in here something to write to usermetas a "[username].json"
-    # needs to involve password to generate secretkey publickey pair.
-    #
     public_key = binascii.hexlify(crypto.key_gen(password)[1])
 
     user_dict = {"username": username, "publickey": public_key}
@@ -49,7 +44,7 @@ def create_user(username, password, description=None):
     path = home_dir + "/.spp/users"
     os.mkdir(path + "/" + username)
     os.mkdir(path + "/" + username + "/data")
-    os.mkdir(path + "/" + username + "/metadata")  # Hash checksums for the data that you push to blockchain
+    os.mkdir(path + "/" + username + "/metadata")
     os.mkdir(path + "/" + username + "/metadata/unconfirmed")
     os.mkdir(path + "/" + username + "/metadata/confirmed")
 

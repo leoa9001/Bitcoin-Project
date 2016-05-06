@@ -20,34 +20,29 @@ def key_gen(passphrase, dummy=False):
     return (full_key.exportKey(format="DER"), public_key.exportKey(format="DER"))
 
 
-# User sha256 from hashlib and return hexdigest (figure out how to make it work for arbitrary data though)
-# def hash(path_to_data):
+
 
 
 # have input data in bytes and it will return a string
 def address(input_data_bytes):
+
+    #Do it twice for valid address hacks.
     hasher = hashlib.sha256()
     hasher.update(input_data_bytes)
     hash = hasher.digest()
-    # print("Step 2: ")
-    # print(hasher.hexdigest().upper())
-    # print()
+
+    hasher = hashlib.sha256()
+    hasher.update(hash)
+    hash = hasher.digest()
 
     hasher = hashlib.new("ripemd160")
     hasher.update(hash)
     hash = hasher.digest()
 
-    # print("Step 3: ")
-    # print(hasher.hexdigest().upper())
-    # print()
-
     hash = binascii.unhexlify("00") + hash
 
-    # print("Step 4: " + str(binascii.hexlify(hash)).upper())
-    # print()
     encoded_final = base58.b58encode_check(hash)
 
-    # print((encoded_final).upper())
 
     return encoded_final
 
@@ -62,7 +57,7 @@ class PassPRG:
     # passphrase must be a string
     def __init__(self, passphrase):
         h = hashlib.sha256()
-        h.update(bytes(passphrase, encoding = "utf-8"))
+        h.update(bytes(passphrase, encoding="utf-8"))
         self.__hash = h.digest()
 
     def randfunc(self, N):
@@ -84,7 +79,6 @@ class PassPRG:
 
     def generate(self, num_hashes):
         for i in range(0, num_hashes):
-            # print("Generating w/ hashnum: "+ str(self.__last_hash_num))
             h = hashlib.sha256()
             h.update(self.__hash + bytes(self.__last_hash_num))
             self.__hash_bytes = self.__hash_bytes + h.digest()

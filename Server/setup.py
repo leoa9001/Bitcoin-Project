@@ -48,12 +48,9 @@ def make_wallet(wallet_name):
     # Create a wallet safely
     try:
         api_code = server_util.get_apikey()
-        # print(api_code)
         passphrase = server_util.get_passphrase()
-        # print(passphrase)
         wallet = createwallet.create_wallet(password=passphrase, api_code=api_code,
                                             service_url="http://localhost:3000/", label=wallet_name)
-        # print(wallet.identifier)
     except APIException as exc:
         print("An error has occurred api side; please try again with make_wallet(" + wallet_name + ").")
         print(exc.args)
@@ -73,7 +70,7 @@ def make_wallet(wallet_name):
     wallet_writer = open(main_dir + "/Wallets/" + wallet_name + ".json", "w")
     wallet_writer.write(json.dumps(wallet_dct, indent=4 * ' '))
     wallet_writer.close()
-    # ^only [wallet_name].json
+
 
     os.mkdir(main_dir + "/Publishes/" + wallet_name)
     file = open(main_dir + "/Publishes/" + wallet_name + "/tx_hash_list.txt", "w")

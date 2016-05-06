@@ -1,4 +1,3 @@
-#easier way to get the apikey
 def get_apikey():
     file = open("apikey.txt","r")
     apikey = file.read()

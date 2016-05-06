@@ -31,7 +31,7 @@ def get_user(username, password=None):
     return User(username, password)
 
 
-# Function that turns arbitrary file into a string; should be updated later.
+# Function that turns arbitrary file/directory into a bytearray.
 def to_bytes(path_to_file):
     if os.path.isfile(path_to_file):
         file = open(path_to_file, "rb")
@@ -42,23 +42,23 @@ def to_bytes(path_to_file):
     if os.path.isdir(path_to_file):
         byte_array = bytearray()
         for root, dirs, files in os.walk(path_to_file):
-            # gc.disable()
             for file in files:
-                # print(os.path.isfile(root+ "/"+ file))
                 file = open(root+"/"+file,"rb")
                 byte_array+=file.read()
                 file.close()
-            # gc.enable()
         return bytes(byte_array)
     return b""
 
 # This only works if you have a local working Server of the form outlined in Server and service-my-wallet working
-def send_in(address, type="local"):
+def send_in(hash, type="local"):
     # Send in the thing and wait for a response in the form of tx_hash
     if type != "local":
         return "dummytransactionhash"
 
-    tx_hash = Server.server_util.private_publish(address)
+
+    address = crypto.address(hash)
+
+    tx_hash = Server.server_util.private_publish(hash, address)
     return tx_hash
 
 
@@ -151,8 +151,8 @@ class User:
         h.update(self.__publickey)
         h.update(text_data)
 
-        address = crypto.address(h.digest())
-        tx_hash = send_in(address)  # may need to check this later.
+
+        tx_hash = send_in(h.digest())  # may need to check this later.
 
         if tx_hash == "failed private publish":
             raise Exception("Private publish failed server side.")
@@ -162,7 +162,7 @@ class User:
             "name": name,
             "filename": new_data_name,
             "hash": h.hexdigest(),
-            "address": address,
+            "address": crypto.address(h.digest()),
             "tx_hash": tx_hash,
             "time": get_current_time()
         }
@@ -208,8 +208,7 @@ class User:
                         continue
 
                     if response[1] == -1:
-                        print(
-                            "Unconfirmed file " + filename + ". However, the tx has gone in and should be confirmed soon.")
+                        print("Unconfirmed file " + filename + ". However, the tx has gone in and should be confirmed soon.")
                         continue
 
                     dct["realtime"] = response[0]

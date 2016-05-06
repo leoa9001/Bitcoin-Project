@@ -3,7 +3,9 @@ import simplejson as json
 from blockchain import wallet
 import datetime
 from blockchain.util import APIException
-
+import hashlib
+import binascii
+import base58
 
 def get_apikey():
     file = open(os.path.expanduser("~") + "/.sppserver/apikey.txt", "r")
@@ -51,13 +53,15 @@ def get_wallet(wallet_name="MainWallet"):
         passphrase = get_passphrase()
     else:
         passphrase = wallet_json["passphrase"]
-    # print(passphrase)
     return wallet.Wallet(identifier=wallet_json["identifier"], password=passphrase,
                          service_url="http://localhost:3000/", api_code=get_apikey())
 
 
 # Should return the transaction hash:
-def private_publish(address, wallet_name="MainWallet"):
+def private_publish(hash, address, wallet_name="MainWallet"):
+    if not address(hash)==address:
+        raise Exception("Invalid address and or hash.")
+
     wallet = get_wallet(wallet_name)
     try:
         response = wallet.send(to=address, amount=5461)
@@ -86,9 +90,32 @@ def private_publish(address, wallet_name="MainWallet"):
 
 
 def get_donation_address(wallet_name="MainWallet"):
-    wallet = get_wallet("MainWallet")
+    wallet = get_wallet(wallet_name)
     return wallet.new_address(label="Donation Address").address
 
 
 def get_balance(wallet_name="MainWallet"):
     return get_wallet(wallet_name).get_balance()
+
+# have input data in bytes and it will return a string
+def address(input_data_bytes):
+
+    #Do it twice for valid address hacks.
+    hasher = hashlib.sha256()
+    hasher.update(input_data_bytes)
+    hash = hasher.digest()
+
+    hasher = hashlib.sha256()
+    hasher.update(hash)
+    hash = hasher.digest()
+
+    hasher = hashlib.new("ripemd160")
+    hasher.update(hash)
+    hash = hasher.digest()
+
+    hash = binascii.unhexlify("00") + hash
+
+    encoded_final = base58.b58encode_check(hash)
+
+
+    return encoded_final

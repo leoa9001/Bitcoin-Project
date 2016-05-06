@@ -15,7 +15,6 @@ def backitup(path_to_dir, description=None):
     shutil.copytree(os.path.expanduser("~") + "/.spp", path_to_dir + "/" + timestamp + "/spp")
     shutil.copytree(os.path.expanduser("~") + "/.sppserver", path_to_dir + "/" + timestamp + "/sppserver")
     file = open(path_to_dir + "/" + timestamp + "/date.txt", "w")
-    # print(now)
     file.write(str(now))
     file.close()
 
